@@ -1,9 +1,8 @@
-# pyforest - lazy-import of all popular Python Data Science libraries. Stop writing the same imports over and over again.
+# Writing the same imports over and over again sucks. Let pyforest do the job for you.
 
-pyforest lazy-imports all popular Python Data Science libraries so that they are always there when you need them. If you don't use a library, it won't be imported. When you are done with your script, you can export the Python code for the import statements.
+pyforest lazy-imports all popular Python Data Science libraries so that they are always there when you need them. Once you use a package, pyforest imports it and even adds the import statement to your first Jupyter cell. If you don't use a library, it won't be imported. 
 
 - [Demo in Jupyter Notebook](#demo-in-jupyter-notebook)
-- [Demo in Python Shell](#demo-in-python-shell)
 - [Using pyforest](#using-pyforest)
 - [Installation](#installation)
 - [FAQs](#frequently-asked-questions)
@@ -15,32 +14,29 @@ pyforest lazy-imports all popular Python Data Science libraries so that they are
 
 
 ## Demo in Jupyter Notebook
-![demo](examples/assets/pyforest_demo_in_jupyter.gif)
-
-
-## Demo in Python Shell
-![demo](examples/assets/pyforest_demo_in_python_shell.png)
+![demo](examples/assets/pyforest_demo_in_jupyter_notebook.gif)
 
 
 ## Using pyforest
-pyforest lazy-imports all popular Python Data Science libraries with a single line of code:
+
+After you [installed](#installation) pyforest and its Jupyter extension, you can __use your favorite Python Data Science commands like you normally would - just without writing imports__.
+
+For example, if you want to read a CSV with pandas:
 
 ```python
-from pyforest import *
+df = pd.read_csv("titanic.csv")
 ```
 
-And if you use Jupyter or IPython, you can even skip this line because pyforest adds itself to the autostart.
-
-When you are done with your script, you can export all import statements via:
-
+pyforest will automatically import pandas for you and add the import statement to the first cell:
 ```python
-active_imports()
+import pandas as pd
 ```
 
-Which libraries are available?
-- We aim to add all popular Python Data Science libraries which should account for >99% of your daily imports. For example, `pandas` as `pd`, `numpy` as `np`, `seaborn` as `sns`, `matplotlib.pyplot` as `plt`, or `OneHotEncoder` from `sklearn` and many more. In addition, there are also helper modules like `os`, `re`, `tqdm`, or `Path` from `pathlib`.
-- You can see an overview of all available lazy imports if you type `lazy_imports()` in Python.
-- If you are missing an import, you can add it to the [pyforest imports](src/pyforest/_imports.py).
+
+__Which libraries are available?__
+- We aim to add all popular Python Data Science libraries which should account for >99% of your daily imports. For example, we already added `pandas` as `pd`, `numpy` as `np`, `seaborn` as `sns`, `matplotlib.pyplot` as `plt`, or `OneHotEncoder` from `sklearn` and many more. In addition, there are also helper modules like `os`, `re`, `tqdm`, or `Path` from `pathlib`.
+- You can see an overview of all currently available imports [here](src/pyforest/_imports.py)
+- If you are missing an import, you can either __add the import to your user specific pyforest imports__ as described in the [FAQs](#frequently-asked-questions) or you can open a pull request for the official [pyforest imports](src/pyforest/_imports.py)
 
 > In order to gather all the most important names, we need your help. Please open a pull request and add the [imports](src/pyforest/_imports.py) that we are still missing.
 
@@ -49,19 +45,22 @@ Which libraries are available?
 
 > You need Python 3.6 or above because we love f-strings.
 
-From the terminal, enter:
+From the terminal (or Anaconda prompt in Windows), enter:
 
-`pip install pyforest`
+```bash
+pip install --upgrade pyforest
+python -m pyforest install_extensions
+```
 
 And you're ready to go.
 
-Please note, that this will also add pyforest to your IPython default startup settings.
+Please note, that this will also add pyforest to your IPython default startup settings. If you do not want this, you can disable the auto_import as described in the [FAQs](#frequently-asked-questions) below.
 
 
 ## Frequently Asked Questions
 
-- __"I need to always explicitly write down the libraries I used at the top of my scripts."__
-    - Of course, you can export the import statements for all used libraries with `active_imports()`.
+- __"How to add my own import statements without adding them to the package source code?"__
+    - pyforest creates a file in your home directory at `~/.pyforest/user_imports.py` in which you can type any **explicit** import statements you want (e.g. `import pandas as pd`). Your own custom imports take precedence over any other pyforest imports. **Please note:** implicit imports (e.g. `from pandas import *`) won't work.
 
 - __"Doesn't this slow down my Jupyter or Python startup process?"__
     - No, because the libraries will only be imported when you actually use them. Until you use them, the variables like `pd` are only pyforest placeholders.
@@ -73,28 +72,22 @@ Please note, that this will also add pyforest to your IPython default startup se
     - Tensorflow is included in pyforest but pyforest does not install any dependencies. You need to install your libraries separately from pyforest. Afterwards, you can access the libraries via pyforest if they are included in the [pyforest imports](src/pyforest/_imports.py).
 
 - __"Will the pyforest variables interfere with my own local variables?"__
-    - Please make sure that you import pyforest at the beginning of your script. Then you will always be safe. You can use your variables like you would without pyforest. The worst thing that can happen is that you overwrite a pyforest placeholder and thus cannot use the placeholder any more (duh).
+    - No, never. pyforest will never mask or overwrite any of your local variables. You can use your variables like you would without pyforest. The worst thing that can happen is that you overwrite a pyforest placeholder and thus cannot use the placeholder any more (duh).
 
 - __"What about auto-completion on lazily imported modules?"__
     - It works :) As soon as you start the auto-completion, pyforest will import the module and return the available symbols to your auto-completer.
 
 - __"How to (temporarily) deactivate the auto_import in IPython and Jupyter?"__
-    - Go to the directory `~/.ipython/profile_default/startup` and adjust or delete the `pyforest_autoimport.py` file. You will find further instructions in the file.
+    - Go to the directory `~/.ipython/profile_default/startup` and adjust or delete the `pyforest_autoimport.py` file. You will find further instructions in the file. If you don't use the auto_import, you will need to import pyforest at the beginning of your notebook via `import pyforest`
 
 - __"How to (re)activate the pyforest auto_import?"__
     - Execute the following Python command in Jupyter, IPython or Python: `from pyforest.auto_import import setup; setup()`. Please note that the auto_import only works for Jupyter and IPython.
 
-- __"Why is pandas_profiling also imported in the demo?"__
-    - pyforest supports complementary, optional imports. For example, `pandas_profiling` patches the `pd.DataFrame` with the convenience function `df.profile_report`. Therefore, pyforest also imports `pandas_profiling` if you have it installed. If you don't have `pandas_profiling` installed, the optional import will be skipped.
-
-- __"I don't want to copy complementary import statements to the top of my file."__
-    - Please note, that the complementary imports will always appear at the bottom of the import_statements list. So, you can just copy all statements above. Alternatively, you can deactivate complementary imports.
-
-- __"How to deactivate complementary imports?"__
-    - You can uncomment the statements `*.__on_import__()` at the bottom of the [pyforest imports](src/pyforest/_imports.py) file.
+- __"Can I use pyforest outside of the Jupyter Notebook or Lab?"__
+    - Technically, yes. However, this is not the intended use case. pyforest is aimed primarily for the use in a Jupyter Notebook or Lab. If you want to use pyforest in IPython or a Python script etc, please import it as follows `import pyforest`. Afterwards, you can get the currently active imports via `pyforest.active_imports()`
 
 - __"Why is the project called pyforest?"__
-    - In which ecosystem do pandas live?
+    - pyforest is created to be the home for all Data Science packages - including pandas. And in which ecosystems do pandas live? :)
 
 
 ## Contributing
@@ -119,7 +112,7 @@ pd = LazyImport("import pandas as pd")
 
 
 ## About
-pyforest is developed by Florian, Tobias and Guido from 8080 Labs. Our goal is to improve the productivity of Python Data Scientists. Other projects that we are working on are [edaviz.com](https://edaviz.com) and [bamboolib.com](https://bamboolib.com)
+pyforest is developed by [8080 Labs](https://8080labs.com). Our goal is to improve the productivity of Python Data Scientists. If you like the speedup to your workflow, you might also be interested in our other project [bamboolib](https://bamboolib.com)
 
 
 ## Join our community and grow further
@@ -129,4 +122,4 @@ If you
 - want to discuss the future of the Python Data Science ecosystem or
 - are just interested in mingling with like-minded fellows
 
-then, you are invited to [join our slack](https://join.slack.com/t/fasterpyds/shared_invite/enQtNzExNDMxNzQ3NTU0LTNhMjI3MTM5ZGZlN2Y4NWIwOWUxZDg4ODE1MzkyNTc1NDhmNjg5ZGZhYmI1ZjBkNzgzMTI3MDcxNWMzZDA0NGQ).
+then, you are invited to [join our slack](https://join.slack.com/t/fasterpyds/shared_invite/enQtNzYxMTMzMDQ4MDk3LTYyNGRiNTE0OGJkNDEzZGRjNjg2Y2I0YWRlNTlmOGUxMjY5MDY5Yjg1MjliM2QwNmNhZmI3N2MxMmY3MGNiODA).

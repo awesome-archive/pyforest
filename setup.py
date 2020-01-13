@@ -17,5 +17,6 @@ except VersionConflict:
 
 
 if __name__ == "__main__":
-    setup(use_pyscaffold=True)
+    setup()
     setup_auto_import()
+    # extensions cannot be installed because pyforest is only available after the installation
